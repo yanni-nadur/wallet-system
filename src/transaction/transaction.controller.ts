@@ -5,13 +5,18 @@ import { instanceToPlain } from 'class-transformer';
 import { TransferDto } from './dto/transfer.dto';
 import { DepositDto } from './dto/deposit.dto';
 import { ReversalDto } from './dto/reversal.dto';
+import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
+@ApiTags('transactions')
+@ApiBearerAuth()
 @Controller('transaction')
 export class TransactionController {
 	constructor(private readonly transactionService: TransactionService) {}
 
 	@Post('deposit')
 	@UseGuards(JwtAuthGuard)
+	@ApiOperation({ summary: 'Deposit money into user wallet' })
+	@ApiResponse({ status: 201, description: 'Deposit successful' })
 	async deposit(@Req() req, @Body() depositDto: DepositDto) {
 		const userId = req.user.userId;
 		const transaction = await this.transactionService.deposit(userId, depositDto.amount);
@@ -23,8 +28,10 @@ export class TransactionController {
 		return plainTransaction;
 	}
 
-	@UseGuards(JwtAuthGuard)
 	@Post('transfer')
+	@UseGuards(JwtAuthGuard)
+	@ApiOperation({ summary: 'Transfer money to another user' })
+	@ApiResponse({ status: 201, description: 'Transfer successful' })
 	async transfer(@Req() req, @Body() transferDto: TransferDto) {
 		const senderId = req.user.userId;
 		const { recipientEmail, amount } = transferDto;
@@ -38,8 +45,10 @@ export class TransactionController {
 		return plainTransaction;
 	}
 
-	@UseGuards(JwtAuthGuard)
 	@Post('reverse')
+	@UseGuards(JwtAuthGuard)
+	@ApiOperation({ summary: 'Reverse a transaction' })
+	@ApiResponse({ status: 201, description: 'Transaction reversed successfully' })
 	async reverse(@Req() req, @Body() reversalDto: ReversalDto) {
 		const userId = req.user.userId;
 		const { transactionId } = reversalDto;
