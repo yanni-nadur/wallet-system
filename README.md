@@ -13,9 +13,6 @@ API for managing a financial wallet, built with NestJS and PostgreSQL, container
 - [Main Endpoints](#main-endpoints)
 - [Swagger Documentation](#swagger-documentation)
 - [Environment Variables](#environment-variables)
-- [Testing](#testing)
-- [Contributing](#contributing)
-- [License](#license)
 
 ---
 
@@ -48,7 +45,7 @@ This project implements a REST API for user financial management, allowing opera
 1. Clone the repository:
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/yanni-nadur/wallet-system.git
 cd wallet-system
 ```
 
