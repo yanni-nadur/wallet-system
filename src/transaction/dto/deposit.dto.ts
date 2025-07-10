@@ -1,6 +1,6 @@
-import { IsNotEmpty } from 'class-validator';
-
+import { IsNumber, Min } from 'class-validator';
 export class DepositDto {
-    @IsNotEmpty()
-    amount: number;
+	@IsNumber()
+	@Min(0.01, { message: 'Deposit amount must be greater than zero' })
+	amount: number;
 }

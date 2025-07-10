@@ -1,7 +1,6 @@
-import { IsNotEmpty, IsNumber } from 'class-validator';
-
+import { IsNumber, Min } from 'class-validator';
 export class ReversalDto {
-    @IsNotEmpty()
-    @IsNumber()
-    transactionId: number;
+	@IsNumber()
+	@Min(1, { message: 'Valid transactionId must be provided' })
+	transactionId: number;
 }

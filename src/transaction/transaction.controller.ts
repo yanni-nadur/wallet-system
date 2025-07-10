@@ -43,9 +43,9 @@ export class TransactionController {
 	async reverse(@Req() req, @Body() reversalDto: ReversalDto) {
 		const userId = req.user.userId;
 		const { transactionId } = reversalDto;
-	  
+
 		const reversalTransaction = await this.transactionService.reverseTransaction(userId, transactionId);
-	  
+
 		return {
 			id: reversalTransaction.id,
 			type: reversalTransaction.type,
@@ -65,5 +65,5 @@ export class TransactionController {
 				},
 			}),
 		};
-	  }
+	}
 }
