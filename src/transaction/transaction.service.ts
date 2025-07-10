@@ -85,7 +85,6 @@ export class TransactionService {
 				throw new BadRequestException('Cannot reverse a reversal transaction');
 			}
 		
-			// Verifica se a transação já foi revertida
 			const alreadyReversed = await transactionRepo.findOne({
 				where: { reversedTransaction: { id: transactionId } },
 			});
@@ -94,55 +93,37 @@ export class TransactionService {
 				throw new BadRequestException('Transaction already reversed');
 			}
 		
-			// Verifica se o usuário que está pedindo a reversão é o dono da transação
 			if (originalTransaction.user.id !== userId) {
 				throw new ForbiddenException('You can only reverse your own transactions');
 			}
 		
-			// Lógica para reverter conforme o tipo
 			if (originalTransaction.type === 'deposit') {
-				// Subtrai o valor do saldo do usuário
 				const user = await userRepo.findOneBy({ id: userId });
 				if (!user) throw new NotFoundException('User not found');
 		
 				if (Number(user.balance) < Number(originalTransaction.amount)) {
-				throw new BadRequestException('Insufficient balance to reverse deposit');
+					throw new BadRequestException('Insufficient balance to reverse deposit');
 				}
 		
 				user.balance = Number(user.balance) - Number(originalTransaction.amount);
 				await userRepo.save(user);
 		
 			} else if (originalTransaction.type === 'transfer') {
-				// Para transferência, deve ajustar remetente e destinatário
-		
-				// Remetente é o dono da transação original
 				const sender = await userRepo.findOneBy({ id: userId });
+
 				if (!sender) throw new NotFoundException('Sender not found');
 		
-				// Precisamos encontrar o destinatário da transferência
-				// Para isso, buscaremos a transação inversa que credita o destinatário
-				// Como não armazenamos diretamente essa info, vamos buscar transações do tipo 'transfer' com mesmo valor e usuário diferente
-		
-				// Alternativamente, para simplicidade, vamos supor que a transferência é registrada somente na conta do remetente
-				// E que o destinatário foi creditado externamente (ou implementar relacionamento mais complexo)
-		
-				// Aqui, para o desafio, vamos assumir que a reversão só ajusta o remetente (simplificação)
-				// Caso queira, podemos implementar relacionamento bidirecional
-		
 				if (Number(sender.balance) < Number(originalTransaction.amount)) {
-				throw new BadRequestException('Insufficient balance to reverse transfer');
+					throw new BadRequestException('Insufficient balance to reverse transfer');
 				}
 		
 				sender.balance = Number(sender.balance) + Number(originalTransaction.amount);
 				await userRepo.save(sender);
 		
-				// Nota: Para o destinatário, idealmente deve ser debitado o valor, mas depende do modelo
-		
 			} else {
 				throw new BadRequestException('Unsupported transaction type for reversal');
 			}
 		
-			// Cria a transação de reversão
 			const reversal = transactionRepo.create({
 				user: originalTransaction.user,
 				amount: originalTransaction.amount,
